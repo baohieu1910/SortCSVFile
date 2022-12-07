@@ -15,7 +15,7 @@ struct List // Manage each small file
     ifstream input_file;
     int size = 0;      // Number of elements imported from the file
     int full_size = 0; // Maximum number of elements imported from the file
-    bool check = true; // The status of the element to continues input or not, True is allowed
+    bool check = true; // The status of the element to continues to input or not, True is allowed
     string s = "";     // The string will be transmitted in each file
 };
 
@@ -213,14 +213,14 @@ int main()
 {
     int size = 0;
     int line = 0;
-    create_and_sort_small_file(size, line);
     cout << "Creating and sorting small file..." << endl;
+    create_and_sort_small_file(size, line);
     cout << "Merging multi sorted small file into large file..." << endl;
     merge_multi_file(size, line);
     cout << "Finish sorting large file!!!" << endl;
     cout << "Removing Small File..." << endl;
     remove_file(size);
-    cout << "Removed Small File..." << endl;
+    cout << "Removed Small File!!!" << endl;
     cout << "Final sorted file name is: sorted_books_rating.csv" << endl;
     return 0;
 }
