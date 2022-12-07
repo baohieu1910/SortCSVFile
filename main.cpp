@@ -218,9 +218,9 @@ int main()
     cout << "Merging multi sorted small file into large file..." << endl;
     merge_multi_file(size, line);
     cout << "Finish sorting large file!!!" << endl;
-    cout << "Removing Small File..." << endl;
+    cout << "Removing all small File..." << endl;
     remove_file(size);
-    cout << "Removed Small File!!!" << endl;
+    cout << "Removed all small File!!!" << endl;
     cout << "Final sorted file name is: sorted_books_rating.csv" << endl;
     return 0;
 }
