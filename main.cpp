@@ -15,7 +15,7 @@ struct List // Manage each small file
     ifstream input_file;
     int size = 0;      // Number of elements imported from the file
     int full_size = 0; // Maximum number of elements imported from the file
-    bool check = true; // The status of the element to see if it continues to enter or not, True is allowed
+    bool check = true; // The status of the element to continues input or not, True is allowed
     string s = "";     // The string will be transmitted in each file
 };
 
