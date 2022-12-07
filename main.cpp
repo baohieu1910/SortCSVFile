@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -6,17 +5,21 @@
 
 using namespace std;
 
-#define FILE_NAME "Books_rating.csv"
-#define FULL_SIZE 100000 // số dòng mong muốn của các file nhỏ được chia
+#define FILE_NAME "Books_rating.csv" // Large file name
+#define OUTPUT_FILE_NAME "sorted_books_rating.csv" // Output file name
+#define SORTED_SMALL_FILE "output_Books_rating_" // Sorted small file name
+#define FULL_SIZE 100000 // The desired lines of small files are divided
 
-struct List // quản lí từng file nhỏ
+struct List // Manage each small file
 {
     ifstream input_file;
-    int size = 0;      // số lượng các phần tử được nhập từ file
-    int full_size = 0; // số lượng tối ta các phần tử có thể nhập được từ file
-    bool check = true; // trạng thái của phần tử xem có tiếp tục nhập vào hay không, true là được phép nhập false là không
-    string s = "";     // chuỗi sẽ được truyền vào ở mỗi file
+    int size = 0;      // Number of elements imported from the file
+    int full_size = 0; // Maximum number of elements imported from the file
+    bool check = true; // The status of the element to see if it continues to enter or not, True is allowed
+    string s = "";     // The string will be transmitted in each file
 };
+
+// Merge vector contains string
 void merge_vector(vector<string> &list, int const left, int const mid, int const right)
 {
     int const sub1 = mid - left + 1;
@@ -62,6 +65,7 @@ void merge_vector(vector<string> &list, int const left, int const mid, int const
     }
 }
 
+//Sort vector contains string
 void merge_sort_vector(vector<string> &list, int const begin, int const end)
 {
     if (begin >= end)
@@ -72,7 +76,7 @@ void merge_sort_vector(vector<string> &list, int const begin, int const end)
     merge_vector(list, begin, mid, end);
 }
 
-
+// Split large file to multi small file and sorting
 void create_and_sort_small_file(int &SIZE, int &LINE)
 {
     fstream input_file, output_file;
@@ -82,8 +86,8 @@ void create_and_sort_small_file(int &SIZE, int &LINE)
     string s;
     while (getline(input_file, s))
     {
-        vector<string> temp; // vector dùng để truyền phần tử vào và sắp xếp sau đó xuất ra file nhỏ
-        output_file.open("output_Books_rating_" + to_string(count + 1) + ".csv", ios::out | ios::binary);
+        vector<string> temp; // vector used to import string and sorting in vector
+        output_file.open(SORTED_SMALL_FILE + to_string(count + 1) + ".csv", ios::out | ios::binary);
         temp.push_back(s);
         count_2++;
         int x = 0;
@@ -96,7 +100,7 @@ void create_and_sort_small_file(int &SIZE, int &LINE)
                 break;
             x++;
         }
-        if (count == 0) // sắp xếp file trừ dòng đầu tiền là dòng định nghĩa (Id,Title,Price,User_id, ..........)
+        if (count == 0) // Sorting all line in file except line 1 (Id,Title,Price,User_id, ..........)
         {
             merge_sort_vector(temp, 1, temp.size() - 1);
         }
@@ -108,13 +112,13 @@ void create_and_sort_small_file(int &SIZE, int &LINE)
         {
             output_file << temp[i] << endl;
         }
-        output_file.close(); // đóng file đã mở
+        output_file.close(); // Close file that opened
         count++;
-        cout << "Created File_" + to_string(count) << endl;
+        cout << "Created output_Books_rating_" + to_string(count) << endl;
     }
     input_file.close();
-    SIZE = count;   // số file nhỏ được chia ra
-    LINE = count_2; // tổng số dòng của file lớn
+    SIZE = count;   // Numbers of small file
+    LINE = count_2; // Line numbers of large file
 }
 
 void merge_multi_file(int SIZE, int LINE)
@@ -124,7 +128,7 @@ void merge_multi_file(int SIZE, int LINE)
 
     for (int i = 0; i < SIZE; i++)
     {
-        list[i].input_file.open("output_Books_rating_" + to_string(i + 1) + ".csv", ios::in | ios::binary);
+        list[i].input_file.open(SORTED_SMALL_FILE + to_string(i + 1) + ".csv", ios::in | ios::binary);
         if (i == SIZE - 1)
         {
             list[i].full_size = LINE - (SIZE - 1) * FULL_SIZE;
@@ -134,7 +138,7 @@ void merge_multi_file(int SIZE, int LINE)
             list[i].full_size = FULL_SIZE;
         }
     }
-    output_file.open("sorted_books_rating.csv", ios::out | ios::binary);
+    output_file.open(OUTPUT_FILE_NAME, ios::out | ios::binary);
     int count = 0;
     while (count < LINE)
     {
@@ -146,8 +150,7 @@ void merge_multi_file(int SIZE, int LINE)
             }
         }
         string min = "zzzzzzzzzz";
-        int temp = 0;
-        // vị trí file chứa phần tử nhỏ nhất
+        int temp = 0; // Position file have min value
         for (int i = 0; i < SIZE; i++)
         {
             if (list[i].size < list[i].full_size)
@@ -185,7 +188,9 @@ void merge_multi_file(int SIZE, int LINE)
             }
         }
         count++;
-        cout << count << endl;
+        if(count % 500000 == 0 || count == LINE){
+            cout << count << " lines have been sorted!!!" << endl;
+        }
         }
     for (int i = 0; i < SIZE; i++)
     {
@@ -195,12 +200,13 @@ void merge_multi_file(int SIZE, int LINE)
     delete[] list;
 }
 
+// Remove all small file was created
 void remove_file(int SIZE)
 {
     for (int i = 0; i < SIZE; i++)
     {
-        string s = "output_Books_rating_" + to_string(i + 1) + ".csv";
-        remove(s.c_str()); // remove tất cả các file nhỏ
+        string s = SORTED_SMALL_FILE + to_string(i + 1) + ".csv";
+        remove(s.c_str());
     }
 }
 int main()
@@ -208,12 +214,13 @@ int main()
     int size = 0;
     int line = 0;
     create_and_sort_small_file(size, line);
-    cout << "Created" << endl;
-    cout << "Sorting" << endl;
+    cout << "Creating and sorting small file..." << endl;
+    cout << "Merging multi sorted small file into large file..." << endl;
     merge_multi_file(size, line);
-    cout << "Sorted" << endl;
-    cout << "Removing Small File" << endl;
+    cout << "Finish sorting large file!!!" << endl;
+    cout << "Removing Small File..." << endl;
     remove_file(size);
-    cout << "DONE" << endl;
+    cout << "Removed Small File..." << endl;
+    cout << "Final sorted file name is: sorted_books_rating.csv" << endl;
     return 0;
 }
